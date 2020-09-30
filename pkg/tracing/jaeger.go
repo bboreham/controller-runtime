@@ -18,7 +18,9 @@ func SetupJaeger(serviceName string) (io.Closer, error) {
 			Param: 1,
 		},
 		Reporter: &jaegercfg.ReporterConfig{
-			LocalAgentHostPort: "jaeger:6831", // can be overridden by env JAEGER_AGENT_HOST
+			// This name chosen so you can create a Service in your cluster
+			// pointing to wherever Jager is running; override by env JAEGER_AGENT_HOST
+			LocalAgentHostPort: "jaeger-agent.default:6831",
 		},
 	}
 	jcfg, err := jcfg.FromEnv()

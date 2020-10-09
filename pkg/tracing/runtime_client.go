@@ -87,7 +87,7 @@ func (c *tracingClient) List(ctx context.Context, list runtime.Object, opts ...c
 
 func (c *tracingClient) Create(ctx context.Context, obj runtime.Object, opts ...client.CreateOption) error {
 	AddTraceAnnotationToObject(ctx, obj)
-	sp := logStart(ctx, "k8s.Create", objectFields(obj)...)
+	sp := logStart(ctx, "k8s.Create", c.blankObjectFields(obj)...)
 	return logError(sp, c.Client.Create(ctx, obj, opts...))
 }
 

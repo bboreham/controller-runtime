@@ -65,33 +65,33 @@ func (c *tracingClient) blankObjectFields(obj runtime.Object) (fields []otlog.Fi
 	return
 }
 
-func (c *tracingClient) Get(ctx context.Context, key client.ObjectKey, obj client.Object) error {
+func (c *tracingClient) Get(ctx context.Context, key client.ObjectKey, obj runtime.Object) error {
 	sp := logStart(ctx, "k8s.Get", append([]otlog.Field{otlog.String("objectKey", key.String())}, c.blankObjectFields(obj)...)...)
 	return logError(sp, c.Client.Get(ctx, key, obj))
 }
 
-func (c *tracingClient) List(ctx context.Context, list client.ObjectList, opts ...client.ListOption) error {
+func (c *tracingClient) List(ctx context.Context, list runtime.Object, opts ...client.ListOption) error {
 	sp := logStart(ctx, "k8s.List", c.blankObjectFields(list)...)
 	return logError(sp, c.Client.List(ctx, list, opts...))
 }
 
-func (c *tracingClient) Create(ctx context.Context, obj client.Object, opts ...client.CreateOption) error {
+func (c *tracingClient) Create(ctx context.Context, obj runtime.Object, opts ...client.CreateOption) error {
 	AddTraceAnnotationToObject(ctx, obj)
 	sp := logStart(ctx, "k8s.Create", c.blankObjectFields(obj)...)
 	return logError(sp, c.Client.Create(ctx, obj, opts...))
 }
 
-func (c *tracingClient) Delete(ctx context.Context, obj client.Object, opts ...client.DeleteOption) error {
+func (c *tracingClient) Delete(ctx context.Context, obj runtime.Object, opts ...client.DeleteOption) error {
 	sp := logStart(ctx, "k8s.Delete", objectFields(obj)...)
 	return logError(sp, c.Client.Delete(ctx, obj, opts...))
 }
 
-func (c *tracingClient) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
+func (c *tracingClient) Update(ctx context.Context, obj runtime.Object, opts ...client.UpdateOption) error {
 	sp := logStart(ctx, "k8s.Update", objectFields(obj)...)
 	return logError(sp, c.Client.Update(ctx, obj, opts...))
 }
 
-func (c *tracingClient) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
+func (c *tracingClient) Patch(ctx context.Context, obj runtime.Object, patch client.Patch, opts ...client.PatchOption) error {
 	fields := objectFields(obj)
 	if data, err := patch.Data(obj); err == nil {
 		fields = append(fields, otlog.String("patch", string(data)))
@@ -100,7 +100,7 @@ func (c *tracingClient) Patch(ctx context.Context, obj client.Object, patch clie
 	return logError(sp, c.Client.Patch(ctx, obj, patch, opts...))
 }
 
-func (c *tracingClient) DeleteAllOf(ctx context.Context, obj client.Object, opts ...client.DeleteAllOfOption) error {
+func (c *tracingClient) DeleteAllOf(ctx context.Context, obj runtime.Object, opts ...client.DeleteAllOfOption) error {
 	sp := logStart(ctx, "k8s.DeleteAllOf", c.blankObjectFields(obj)...)
 	return logError(sp, c.Client.DeleteAllOf(ctx, obj, opts...))
 }
@@ -113,12 +113,12 @@ type tracingStatusWriter struct {
 	client.StatusWriter
 }
 
-func (s *tracingStatusWriter) Update(ctx context.Context, obj client.Object, opts ...client.UpdateOption) error {
+func (s *tracingStatusWriter) Update(ctx context.Context, obj runtime.Object, opts ...client.UpdateOption) error {
 	sp := logStart(ctx, "k8s.Status.Update", objectFields(obj)...)
 	return logError(sp, s.StatusWriter.Update(ctx, obj, opts...))
 }
 
-func (s *tracingStatusWriter) Patch(ctx context.Context, obj client.Object, patch client.Patch, opts ...client.PatchOption) error {
+func (s *tracingStatusWriter) Patch(ctx context.Context, obj runtime.Object, patch client.Patch, opts ...client.PatchOption) error {
 	fields := objectFields(obj)
 	if data, err := patch.Data(obj); err == nil {
 		fields = append(fields, otlog.String("patch", string(data)))

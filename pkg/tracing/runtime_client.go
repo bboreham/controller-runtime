@@ -24,16 +24,6 @@ func WrapRuntimeClient(upstreamNew manager.NewClientFunc) manager.NewClientFunc 
 	}
 }
 
-// helper functions
-func setObjectTags(sp ot.Span, obj runtime.Object) {
-	if gvk := obj.GetObjectKind().GroupVersionKind(); !gvk.Empty() {
-		sp.SetTag("objectKind", gvk.String())
-	}
-	if m, err := meta.Accessor(obj); err == nil {
-		sp.SetTag("objectKey", m.GetNamespace()+"/"+m.GetName())
-	}
-}
-
 func objectFields(obj runtime.Object) (fields []otlog.Field) {
 	if gvk := obj.GetObjectKind().GroupVersionKind(); !gvk.Empty() {
 		fields = append(fields, otlog.String("objectKind", gvk.String()))

@@ -41,7 +41,12 @@ func spanContextFromAnnotations(ctx context.Context, annotations map[string]stri
 	return global.TextMapPropagator().Extract(ctx, annotationsCarrier(annotations))
 }
 
-// AddTraceAnnotationToUnstructured adds an annotation encoding span's context to all objects
+// AddTraceAnnotation adds an annotation encoding current span ID
+func AddTraceAnnotation(ctx context.Context, annotations map[string]string) {
+	global.TextMapPropagator().Inject(ctx, annotationsCarrier(annotations))
+}
+
+// AddTraceAnnotationToUnstructured adds an annotation encoding current span ID to all objects
 // Objects are modified in-place.
 func AddTraceAnnotationToUnstructured(ctx context.Context, objs []unstructured.Unstructured) error {
 	for _, o := range objs {
@@ -49,7 +54,7 @@ func AddTraceAnnotationToUnstructured(ctx context.Context, objs []unstructured.U
 		if a == nil {
 			a = make(map[string]string)
 		}
-		global.TextMapPropagator().Inject(ctx, annotationsCarrier(a))
+		AddTraceAnnotation(ctx, a)
 		o.SetAnnotations(a)
 	}
 
@@ -74,7 +79,7 @@ func AddTraceAnnotationToObject(ctx context.Context, obj runtime.Object) error {
 			}
 		}
 	}
-	global.TextMapPropagator().Inject(ctx, annotationsCarrier(annotations))
+	AddTraceAnnotation(ctx, annotations)
 	m.SetAnnotations(annotations)
 	return nil
 }

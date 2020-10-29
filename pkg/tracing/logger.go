@@ -17,13 +17,13 @@ func (t tracingLogger) Enabled() bool {
 
 func (t tracingLogger) Info(msg string, keysAndValues ...interface{}) {
 	t.Logger.Info(msg, keysAndValues...)
-	t.Span.AddEvent("info", trace.WithAttributes(keyValues(keysAndValues...)...))
+	t.Span.AddEvent(msg, trace.WithAttributes(keyValues(keysAndValues...)...))
 }
 
 func (t tracingLogger) Error(err error, msg string, keysAndValues ...interface{}) {
 	t.Logger.Error(err, msg, keysAndValues...)
-	kvs := append([]attribute.KeyValue{attribute.String("message", msg)}, keyValues(keysAndValues...)...)
-	t.Span.AddEvent("error", trace.WithAttributes(kvs...))
+	kvs := append([]attribute.KeyValue{attribute.String("error", msg)}, keyValues(keysAndValues...)...)
+	t.Span.AddEvent(msg, trace.WithAttributes(kvs...))
 	t.Span.RecordError(err)
 }
 

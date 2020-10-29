@@ -28,13 +28,12 @@ func (a annotationsCarrier) Set(key string, value string) {
 
 // SpanFromAnnotations takes a map as found in Kubernetes objects and
 // makes a new Span parented on the context found there, or nil if not found.
-func SpanFromAnnotations(ctx context.Context, name string, annotations map[string]string) (trace.Span, error) {
+func SpanFromAnnotations(ctx context.Context, name string, annotations map[string]string) (context.Context, trace.Span) {
 	innerCtx := spanContextFromAnnotations(ctx, annotations)
 	if innerCtx == ctx {
-		return nil, nil
+		return ctx, nil
 	}
-	_, sp := global.Tracer(libName).Start(innerCtx, name)
-	return sp, nil
+	return global.Tracer(libName).Start(innerCtx, name)
 }
 
 func spanContextFromAnnotations(ctx context.Context, annotations map[string]string) context.Context {

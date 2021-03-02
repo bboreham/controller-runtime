@@ -18,11 +18,12 @@ func FromObject(ctx context.Context, operationName string, obj runtime.Object) (
 	log := ctrl.LoggerFrom(ctx)
 	m, err := meta.Accessor(obj)
 	if err != nil {
-		return nil, nil, log
+		return ctx, nil, log
 	}
-	ctx, sp := SpanFromAnnotations(ctx, operationName, m.GetAnnotations())
+	var sp trace.Span
+	ctx, sp = SpanFromAnnotations(ctx, operationName, m.GetAnnotations())
 	if sp == nil {
-		return nil, nil, log
+		return ctx, nil, log
 	}
 	sp.SetAttributes(attribute.String("objectKey", m.GetNamespace()+"/"+m.GetName()))
 	log = tracingLogger{Logger: log, Span: sp}

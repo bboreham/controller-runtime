@@ -6,7 +6,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/exporters/otlp"
-	"go.opentelemetry.io/otel/exporters/otlp/otlpgrpc"
+	"go.opentelemetry.io/otel/exporters/otlp/otlphttp"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -16,9 +16,9 @@ import (
 // SetupOTLP sets up a global trace provider sending to OpenTelemetry with some defaults
 func SetupOTLP(serviceName string) (io.Closer, error) {
 	ctx := context.Background()
-	driver := otlpgrpc.NewDriver(
-		otlpgrpc.WithInsecure(),
-		otlpgrpc.WithEndpoint("otlp-collector.default:55680"),
+	driver := otlphttp.NewDriver(
+		otlphttp.WithInsecure(),
+		otlphttp.WithEndpoint("otlp-collector.default:55680"),
 	)
 	exp, err := otlp.NewExporter(context.Background(), driver)
 	if err != nil {
